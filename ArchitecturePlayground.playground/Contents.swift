@@ -1,5 +1,7 @@
 import SwiftUI
 
+// MARK - Models
+
 enum Home {
     struct State {
         var message: String
@@ -12,16 +14,21 @@ enum Home {
 
 typealias HomeStore = ViewStore<Home.State, Home.Action, HomeInteractor>
 
+// MARK - Display
+
 struct HomeView: View {
     @StateObject var store: HomeStore
 
     var body: some View {
-        Text(store.state.message)
-            .onAppear {
-                store.handleAction(.onAppear)
-            }
+        VStack {
+            Text(store.state.message)
+        }.onAppear {
+            store.handleAction(.onAppear)
+        }
     }
 }
+
+// MARK - Business logic
 
 class HomeInteractor: Interacting  {
     typealias Action = Home.Action
@@ -36,6 +43,8 @@ class HomeInteractor: Interacting  {
         presenter.present(message: "hello world")
     }
 }
+
+// MARK: - Presentation logic
 
 protocol HomePresenting {
     func present(message: String)
@@ -59,13 +68,13 @@ class HomePresenter<Store: StateHolder>: HomePresenting where Store.State == Hom
 let initialState = Home.State(message: "")
 let store: HomeStore = ViewStore(state: initialState)
 
-// MARK: - Resolution adding interaction
+// MARK: - Resolution for interaction
 
 let presenter = HomePresenter(store: store)
 let interactor = HomeInteractor(presenter: presenter)
 store.setInteractor(interactor)
 
-// MARK: - Data flow
+// MARK: - Testing data flow
 
 store.handleAction(.onAppear)
 print(store.state)
