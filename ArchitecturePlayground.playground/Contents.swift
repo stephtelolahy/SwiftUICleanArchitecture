@@ -58,7 +58,7 @@ class HomePresenter<Store: StateHolder>: HomePresenting where Store.State == Hom
     }
 
     func present(message: String) {
-        store.state.message = message
+        store.state.message = "\(message) 👋"
     }
 }
 
