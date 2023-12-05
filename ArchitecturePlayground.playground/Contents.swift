@@ -1,5 +1,14 @@
 import SwiftUI
-import Combine
+
+enum Home {
+    struct State {
+        var message: String
+    }
+
+    enum Action {
+        case onAppear
+    }
+}
 
 typealias HomeStore = ViewStore<Home.State, Home.Action, HomeInteractor>
 
@@ -11,16 +20,6 @@ struct HomeView: View {
             .onAppear {
                 store.handleAction(.onAppear)
             }
-    }
-}
-
-enum Home {
-    struct State {
-        var message: String
-    }
-
-    enum Action {
-        case onAppear
     }
 }
 
@@ -43,7 +42,7 @@ protocol HomePresenting {
 }
 
 class HomePresenter<Store: StateHolder>: HomePresenting where Store.State == Home.State {
-    var store: Store
+    private var store: Store
 
     init(store: Store) {
         self.store = store
@@ -55,16 +54,18 @@ class HomePresenter<Store: StateHolder>: HomePresenting where Store.State == Hom
 }
 
 
-// MARK: - Resolution
+// MARK: - Resolution for Preview
 
 let initialState = Home.State(message: "")
 let store: HomeStore = ViewStore(state: initialState)
 
+// MARK: - Resolution adding interaction
+
 let presenter = HomePresenter(store: store)
 let interactor = HomeInteractor(presenter: presenter)
-store.setInteractor(interactor: interactor)
+store.setInteractor(interactor)
 
-// MARK: - Action
+// MARK: - Data flow
 
 store.handleAction(.onAppear)
 print(store.state)

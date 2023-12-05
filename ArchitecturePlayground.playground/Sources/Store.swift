@@ -1,5 +1,4 @@
 import SwiftUI
-import Combine
 
 public final class ViewStore<State, Action, Interactor: Interacting>: ObservableObject, StateHolder, Interacting  where Interactor.Action == Action {
 
@@ -11,7 +10,7 @@ public final class ViewStore<State, Action, Interactor: Interacting>: Observable
         self.state = state
     }
 
-    public func setInteractor(interactor: Interactor) {
+    public func setInteractor(_ interactor: Interactor) {
         self.interactor = interactor
     }
 
