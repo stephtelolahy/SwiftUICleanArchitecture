@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// An illustration of clean architecture
+/// respecting SwiftUI's state management
+
 // MARK - Models
 
 enum Home {
@@ -12,9 +15,9 @@ enum Home {
     }
 }
 
-typealias HomeStore = ViewStore<Home.State, Home.Action, HomeInteractor>
-
 // MARK - Display
+
+typealias HomeStore = ViewStore<Home.State, Home.Action>
 
 struct HomeView: View {
     @StateObject var store: HomeStore
@@ -58,23 +61,22 @@ class HomePresenter<Store: StateHolder>: HomePresenting where Store.State == Hom
     }
 
     func present(message: String) {
-        store.state.message = "\(message) 👋"
+        store.state.message = "\(message.uppercased()) 👋"
     }
 }
 
 
-// MARK: - Resolution for Preview
+// MARK: - Usage
 
+// Resolving for Preview
 let initialState = Home.State(message: "")
 let store: HomeStore = ViewStore(state: initialState)
 
-// MARK: - Resolution for interaction
-
+// Resolving for Interaction
 let presenter = HomePresenter(store: store)
 let interactor = HomeInteractor(presenter: presenter)
 store.setInteractor(interactor)
 
-// MARK: - Testing data flow
-
+// Testing data flow
 store.handleAction(.onAppear)
 print(store.state)
