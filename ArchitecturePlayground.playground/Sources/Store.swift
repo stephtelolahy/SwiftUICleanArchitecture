@@ -1,6 +1,6 @@
 import SwiftUI
 
-public final class ViewStore<State, Action>: ObservableObject, StateHolder, Interacting {
+public final class ViewStore<State, Action>: ObservableObject, Interacting {
 
     @Published public var state: State
 
@@ -10,10 +10,6 @@ public final class ViewStore<State, Action>: ObservableObject, StateHolder, Inte
         self.state = state
     }
 
-    public func setInteractor<Interactor: Interacting>(_ interactor: Interactor) where Interactor.Action == Action {
-        self.interactor = interactor
-    }
-
     public func handleAction(_ action: Action) {
         guard let interactor = self.interactor as? any Interacting<Action> else {
             return
@@ -21,16 +17,14 @@ public final class ViewStore<State, Action>: ObservableObject, StateHolder, Inte
 
         interactor.handleAction(action)
     }
+
+    public func setInteractor<T: Interacting>(_ interactor: T) where T.Action == Action {
+        self.interactor = interactor
+    }
 }
 
 public protocol Interacting<Action> {
     associatedtype Action
 
     func handleAction(_ action: Action)
-}
-
-public protocol StateHolder: AnyObject {
-    associatedtype State
-
-    var state: State { get set }
 }
