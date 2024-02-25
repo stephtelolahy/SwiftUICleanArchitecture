@@ -1,7 +1,7 @@
 import Combine
 
 protocol CountryService {
-    func loadCountries() -> AnyPublisher<Result<[String], Error>, Never>
+    func loadCountries() -> AnyPublisher<[String], Error>
 }
 
 struct CountriesReducer {
@@ -17,7 +17,7 @@ struct CountriesReducer {
 
     enum Event {
         case didAppear
-        case didLoadCountriesResponse(Result<[String], Error>)
+        case didFinishLoadCountries(Result<[String], Error>)
     }
 
     func handle(event: Event, state: inout State) -> AnyPublisher<Event, Never>? {
@@ -25,16 +25,29 @@ struct CountriesReducer {
         case .didAppear:
             state = .loading
             return service.loadCountries()
-                .map { .didLoadCountriesResponse($0) }
+                .toResult()
+                .map { .didFinishLoadCountries($0) }
                 .eraseToAnyPublisher()
 
-        case let .didLoadCountriesResponse(.success(countries)):
+        case let .didFinishLoadCountries(.success(countries)):
             state = .loaded(countries)
             return nil
 
-        case let .didLoadCountriesResponse(.failure(error)):
+        case let .didFinishLoadCountries(.failure(error)):
             state = .failed
             return nil
         }
     }
+}
+
+extension AnyPublisher {
+    func toResult() -> AnyPublisher<Result<Output, Failure>, Never> {
+        map { Result.success($0) }
+        .catch { Just(Result.failure($0)) }
+        .eraseToAnyPublisher()
+    }
+}
+
+enum APIError: Error {
+    case unknown
 }
